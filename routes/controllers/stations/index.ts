@@ -16,8 +16,8 @@ export default {
   /**
    * 
    * @param req ()
-   * @param res { success: boolean, message?: string }
-   * @return Array<Station>
+   * @param res Array<Station>
+   * 
    */
 
   async getAllStations(req: Request, res: StationsResponse) {
@@ -35,8 +35,8 @@ export default {
 
   /**
    * 
-   * @param req ()
-   * @param res { success: boolean, message?: string }
+   * @param req { body: { username: string, password: string }: { body: Station } }
+   * @param res { success: boolean }
    */
 
   async postStation(req: StationsRequest, res: StationsResponse) {
@@ -59,8 +59,8 @@ export default {
 
   /**
    * 
-   * @param req ()
-   * @param res { success: boolean, message?: string }
+   * @param req { body: Station }
+   * @param res { success: boolean }
    */
 
   async updateStation(req: StationsRequest, res: StationsResponse) {
@@ -90,7 +90,7 @@ export default {
 
   /**
    * 
-   * @param req ()
+   * @param req { params: { id: string } }
    * @param res { success: boolean }
    * 
    */

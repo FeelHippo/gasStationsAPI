@@ -31,4 +31,3 @@ userSchema.statics.instantiate = (authentication: UserInterface) => new User(aut
 const User = mongoose.model<UserDoc, modelInterface>('User', userSchema);
 
 export { User }
-// User.instantiate({ username: 'me', password: 'you' })

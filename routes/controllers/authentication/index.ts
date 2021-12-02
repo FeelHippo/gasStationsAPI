@@ -29,7 +29,7 @@ export default {
 
   /**
    * 
-   * @param req { body: { username: string, password: string } }
+   * @param req { body: { username: string, password: string }: { body: UserInterface } }
    * @param res { newUser: UserInterface, success: boolean, message?: string }
    * 
    */
@@ -61,7 +61,7 @@ export default {
 
   /**
    * 
-   * @param req { body: { username: string, password: string } }
+   * @param req { body: { username: string, password: string }: { body: UserInterface } }
    * @param res { username: string, password: string, success: boolean, token?: string, message?: string }
    * 
    */
@@ -104,7 +104,7 @@ export default {
       
       if (!token) return res.json({ success: false, message: 'No Auth Token' });
 
-      const verified: any = jwt.verify(token, process.env.JWT_SECRET); // not elegant but => interface JwtPayload { [key: string]: any; }
+      const verified: any = jwt.verify(token, process.env.JWT_SECRET);
       if (!verified) return res.json({ success: false, message: 'User not verified' });
 
       const user = await User.findById(verified._id);
