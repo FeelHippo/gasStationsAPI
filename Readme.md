@@ -42,21 +42,21 @@ The REST API and its various endpoints are described below.
 `GET /user/login/:user`
 
 ### Response
-
+```
   {
     "username": "UserAdmin",
     "password": "123abc",
     "success": true,
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWE4OWEzMTM0ZTRhZGFkM2QxOTQ2ODciLCJpYXQiOjE2Mzg0Mzk1MTQsImV4cCI6MTYzOTA0NDMxNH0.BCBUOjn8HJxUILjE5MYvB5Uy_aJ-ujpfSs2MPM_oLuU"
   }
-
+```
 ## Create an account:
 ### Request
 
 `POST /user/register`
 
 ### Response
-
+```
   {
     "_doc": {
         "username": "newUserName",
@@ -66,32 +66,32 @@ The REST API and its various endpoints are described below.
     },
     "success": true
   }
-
+```
 ## Authenticate existing account
 ### Request
 
 `POST /user/login`
 
 ### Response
-
+```
   {
     "username": "UserAdmin",
     "password": "123abc",
     "success": true,
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWE4OWEzMTM0ZTRhZGFkM2QxOTQ2ODciLCJpYXQiOjE2Mzg0Mzk1MTQsImV4cCI6MTYzOTA0NDMxNH0.BCBUOjn8HJxUILjE5MYvB5Uy_aJ-ujpfSs2MPM_oLuU"
   } 
-
+```
 ## Initiate/validate JWT token
 ### Request
 
 `GET /user/tokenIsValid`
 
 ### Response
-
+```
   {
     "success": true
   } 
-
+```
 ------------------------------------
 # Stations
 
@@ -101,7 +101,7 @@ The REST API and its various endpoints are described below.
 `GET /api/allStations`
 
 ### Response
-
+```
   [
     {
       "id": "MIGROL_100086",
@@ -139,14 +139,14 @@ The REST API and its various endpoints are described below.
     },
     ...
   ]
-
+```
 ## Create new station
 ### Request
 
 `POST /api/postStation`
 
 * Payload:
-
+```
 {
   "id": string,
   "name": string,
@@ -175,40 +175,41 @@ The REST API and its various endpoints are described below.
       }
   ],
 }
-
+```
 ### Response
-
+```
   {
     status: 200,
     {
       "success": true
     } 
   }
-
+```
 ## Update existing station
 ### Request
 
 `PUT /api/updateStation`
 
 ### Response
-
+```
   {
     status: 200,
     {
       "success": true
     } 
   }
-
+```
 ## Get changed Thing
 ### Request
 
 `DELETE /api/deleteStation/:id`
 
 ### Response
-
+```
   {
     status: 200,
     {
       "success": true
     } 
   }
+```
