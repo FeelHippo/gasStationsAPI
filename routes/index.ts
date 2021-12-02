@@ -15,4 +15,14 @@ export const authentication = (app: express.Application) => {
 
 }
 
-export const gasStations = (app: express.Application) => {}
+export const gasStations = (app: express.Application) => {
+
+  // return geoLocation data
+  app.get('/api/allStations', Controller.getAllStations)
+
+  // create new station
+  app.post('/api/postStation', Controller.postStation)
+
+  // update existing station
+  app.put('/api/updateStation', Controller.updateStation)
+}
