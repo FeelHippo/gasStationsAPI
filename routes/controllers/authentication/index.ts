@@ -1,25 +1,10 @@
 import { Request, Response } from 'express';
-// authentication 
-import { User, UserInterface } from '../models/user';
-import { Station } from '../models/stations';
+import { User, UserInterface } from '../../../models/user';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import validator from 'validator';
+import { handleValidation } from '../../../utils/index'
 
-// data
-import * as fs from 'fs';
-import Loki from 'lokijs';
-import { loadCollection } from '../utils/collection';
-
-const db = new Loki(`${process.env.UPLOAD_PATH}/${process.env.COLLECTION_DATA}`, { persistenceMethod: 'fs' });
-// create destination folder if does not exist yet
-if (!fs.existsSync(process.env.UPLOAD_PATH)) fs.mkdirSync(process.env.UPLOAD_PATH);
-
-interface StationsRequest extends Request, Station {}
-interface StationsResponse extends Response, Station {}
-
-
-class Controller {
+export default {
 
   /**
    * 
@@ -39,7 +24,7 @@ class Controller {
     } catch (err) {
       console.error(err.message)
     }
-  }
+  },
 
 
   /**
@@ -54,16 +39,8 @@ class Controller {
       const credentials: UserInterface = req?.body;
       const { username, password}: { username: string, password: string } = credentials
 
-      if(
-        !validator.isAlphanumeric(username)
-        || validator.isEmpty(username)
-        || !validator.isLength(username, {min: 7, max: undefined})
-      ) return res.status(202).json({ success: false, message: 'Username must be alphanumeric, and be at least 7 characters long.' })
-
-      if(
-        !validator.isAlphanumeric(password)
-        || validator.isEmpty(password)
-      ) return res.status(202).json({ success: false, message: 'Password must contain alphanumeric characters.' })
+      // validate username and password
+      handleValidation(username, password, res);
 
       // make sure there is no duplicate username
       const existingUser: UserInterface = await User.findOne({ username })
@@ -80,7 +57,7 @@ class Controller {
     } catch (err) {
       console.error(err.message);
     }
-  }
+  },
 
   /**
    * 
@@ -112,7 +89,7 @@ class Controller {
     } catch (err) {
       console.error(err.message);
     }
-  }
+  },
 
   /**
    * 
@@ -138,84 +115,6 @@ class Controller {
     } catch (err) {
       console.error(err.message);
     }
-  }
+  },
 
-  /**
-   * 
-   * @param req ()
-   * @param res { success: boolean, message?: string }
-   * @return Array<Station>
-   */
-
-  async getAllStations(req: Request, res: StationsResponse) {
-    try {
-
-      const col = await loadCollection(process.env.COLLECTION_DATA, db);
-      const { data } = col;
-      const filteredData = data.map(({ $loki, ...station }) => ({ ...station }));
-      return res.status(200).json(filteredData);
-
-    } catch (err) {
-      console.error(err.message);
-    }
-  }
-
-  /**
-   * 
-   * @param req ()
-   * @param res { success: boolean, message?: string }
-   */
-
-  async postStation(req: StationsRequest, res: StationsResponse) {
-    try {
-
-      const newStation: Station = req.body;
-      
-      const col = await loadCollection(process.env.COLLECTION_DATA, db);
-
-      col.setChangesApi(false);
-      col.insert(newStation);
-      db.saveDatabase();
-
-      return res.status(200).json({ success: true })
-
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  /**
-   * 
-   * @param req ()
-   * @param res { success: boolean, message?: string }
-   */
-
-  async updateStation(req: StationsRequest, res: StationsResponse) {
-    try {
-      
-      let newStation: Station = req.body;
-      
-      const col = await loadCollection(process.env.COLLECTION_DATA, db);
-      col.findAndUpdate({ id: newStation.id }, data => {
-        
-        data.name = newStation.name
-        data.address = newStation.address
-        data.city = newStation.city
-        data.pumps = newStation.pumps
-
-        return data
-      })
-      
-      db.saveDatabase();
-
-      return res.status(200).json({ success: true })
-
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-};
-
-export default new Controller;
-
+}
