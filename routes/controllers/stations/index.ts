@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Station } from '../../../types/stations';
 import * as fs from 'fs';
 import Loki from 'lokijs';
-import { loadCollection } from '../../../utils/index'
+import { loadCollection } from '../../../utils/index';
 
 const db = new Loki(`${process.env.UPLOAD_PATH}/${process.env.COLLECTION_DATA}`, { persistenceMethod: 'fs' });
 // create destination folder if does not exist yet
