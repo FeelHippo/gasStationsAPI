@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { User, UserInterface } from '../../../models/user';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { handleValidation } from '../../../utils/index'
+import { handleValidation } from '../../../utils/index';
+import HttpException from '../../../exceptions/HttpException';
 
 export default {
 
@@ -13,7 +14,7 @@ export default {
    * 
    */
 
-  async verify(req: Request, res: Response) {
+  async verify(req: Request, res: Response, next: NextFunction) {
     try {
       const username: string = req?.params?.username ?? '';
       const registeredUser = await User.findOne({ username });
@@ -22,7 +23,7 @@ export default {
       return res.status(200).json(registeredUser);
 
     } catch (err) {
-      console.error(err.message)
+      next(new HttpException(404, err.message));
     }
   },
 
@@ -34,7 +35,7 @@ export default {
    * 
    */
 
-  async register(req: Request, res: Response) {
+  async register(req: Request, res: Response, next: NextFunction) {
     try {
       const credentials: UserInterface = req?.body;
       const { username, password}: { username: string, password: string } = credentials
@@ -55,7 +56,7 @@ export default {
       return res.status(201).send({ ...newUser, success: true });
 
     } catch (err) {
-      console.error(err.message);
+      next(new HttpException(404, err.message));
     }
   },
 
@@ -66,7 +67,7 @@ export default {
    * 
    */
 
-  async login(req: Request, res: Response) {
+  async login(req: Request, res: Response, next: NextFunction) {
     try {
       const credentials: UserInterface = req?.body;
       const { username, password}: { username: string, password: string } = credentials
@@ -87,7 +88,7 @@ export default {
       })
       
     } catch (err) {
-      console.error(err.message);
+      next(new HttpException(404, err.message));
     }
   },
 
@@ -98,7 +99,7 @@ export default {
    * 
    */
 
-  async verifyToken(req: Request, res: Response) {
+  async verifyToken(req: Request, res: Response, next: NextFunction) {
     try {
       const token: string = req?.header('X-Auth-Token');
       
@@ -113,7 +114,7 @@ export default {
       return res.status(200).json({ success: true });
       
     } catch (err) {
-      console.error(err.message);
+      next(new HttpException(404, err.message));
     }
   },
 

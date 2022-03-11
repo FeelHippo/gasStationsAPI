@@ -1,16 +1,22 @@
-import * as express from 'express';
+import { Application } from 'express';
+import Route from '../../interfaces/route';
 import { AuthController } from '../controllers/index';
 
-export default (app: express.Application) => {
-  
-  // verify whether user is registered
-  app.get('/user/login/:user', AuthController.verify);
+export default class AuthenticationRoutes implements Route {
+  public path = '/user';
+  public app;
 
-  // create account
-  app.post('/user/register', AuthController.register);
+  constructor(app: Application) {
+    this.app = app;
 
-  // authenticate existing account + initiate JWT token
-  app.post('/user/login', AuthController.login);
-  app.get('/user/tokenIsValid', AuthController.verifyToken);
+    this.initRoutes();
+  }
 
+  private initRoutes() {
+    this.app
+      .get(`${this.path}/login/:user`, AuthController.verify)
+      .post(`${this.path}/register`, AuthController.register)
+      .post(`${this.path}/login`, AuthController.login)
+      .get(`${this.path}/tokenIsValid`, AuthController.verifyToken);
+  }
 }

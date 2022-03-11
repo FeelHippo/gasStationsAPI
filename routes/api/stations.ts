@@ -1,18 +1,23 @@
-import * as express from 'express';
+import { Application } from 'express';
+import Route from '../../interfaces/route';
 import { StationController } from '../controllers/index';
 import authenticateJWT from '../../utils/authenticateJWT';
 
-export default (app: express.Application) => {
+export default class StationRoutes implements Route {
+  public path = '/api';
+  public app;
 
-  // return geoLocation data
-  app.get('/api/allStations', StationController.getAllStations);
+  constructor(app: Application) {
+    this.app = app;
 
-  // create new station
-  app.post('/api/postStation', authenticateJWT, StationController.postStation);
+    this.initRoutes();
+  }
 
-  // update existing station
-  app.put('/api/updateStation', authenticateJWT, StationController.updateStation);
-
-  // delete station
-  app.delete('/api/deleteStation/:id', authenticateJWT, StationController.deleteStation);
+  private initRoutes() {
+    this.app
+      .get(`${this.path}/allStations`, StationController.getAllStations)
+      .post(`${this.path}/postStation`, authenticateJWT, StationController.postStation)
+      .put(`${this.path}/updateStation`, authenticateJWT, StationController.updateStation)
+      .delete(`${this.path}/deleteStation/:id`, authenticateJWT, StationController.deleteStation);
+  }
 }

@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
-import { Station } from '../../../types/stations';
+import { Request, Response, NextFunction } from 'express';
+import { Station } from '../../../interfaces/stations';
 import * as fs from 'fs';
 import Loki from 'lokijs';
 import { loadCollection } from '../../../utils/index';
+import HttpException from '../../../exceptions/HttpException';
 
 const db = new Loki(`${process.env.UPLOAD_PATH}/${process.env.COLLECTION_DATA}`, { persistenceMethod: 'fs' });
 // create destination folder if does not exist yet
@@ -20,7 +21,7 @@ export default {
    * 
    */
 
-  async getAllStations(req: Request, res: StationsResponse) {
+  async getAllStations(req: Request, res: StationsResponse, next: NextFunction) {
     try {
 
       const col = await loadCollection(process.env.COLLECTION_DATA, db);
@@ -29,7 +30,7 @@ export default {
       return res.status(200).json(filteredData);
 
     } catch (err) {
-      console.error(err.message);
+      next(new HttpException(404, err.message));
     }
   },
 
@@ -39,7 +40,7 @@ export default {
    * @param res { success: boolean }
    */
 
-  async postStation(req: StationsRequest, res: StationsResponse) {
+  async postStation(req: StationsRequest, res: StationsResponse, next: NextFunction) {
     try {
 
       const newStation: Station = req.body;
@@ -53,7 +54,7 @@ export default {
       return res.status(200).json({ success: true })
 
     } catch (err) {
-      console.error(err);
+      next(new HttpException(404, err.message));
     }
   },
 
@@ -63,7 +64,7 @@ export default {
    * @param res { success: boolean }
    */
 
-  async updateStation(req: StationsRequest, res: StationsResponse) {
+  async updateStation(req: StationsRequest, res: StationsResponse, next: NextFunction) {
     try {
       
       let newStation: Station = req.body;
@@ -84,7 +85,7 @@ export default {
       return res.status(200).json({ success: true })
 
     } catch (err) {
-      console.error(err);
+      next(new HttpException(404, err.message));
     }
   },
 
@@ -95,7 +96,7 @@ export default {
    * 
    */
 
-  async deleteStation(req: StationsRequest, res: StationsResponse) {
+  async deleteStation(req: StationsRequest, res: StationsResponse, next: NextFunction) {
     try {
 
       let id: string = req.params.id;
@@ -108,7 +109,7 @@ export default {
       return res.status(200).json({ success: true })
       
     } catch (err) {
-      console.error(err);
+      next(new HttpException(404, err.message));
     }
   },
 

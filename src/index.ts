@@ -1,5 +1,5 @@
-import server from './server'
 import dotenv from 'dotenv';
+import App from './server';
 
 dotenv.config();
-server();
+new App().listen();
