@@ -3,15 +3,13 @@ import mongoose from 'mongoose';
 export interface UserInterface {
   username: string;
   password: string;
-  _id?: string;
 }
 interface modelInterface extends mongoose.Model<any> {
   instantiate(authentication: UserInterface): UserDoc
 }
-interface UserDoc extends mongoose.Document {
+export interface UserDoc extends mongoose.Document {
   username: string;
   password: string;
-  _id?: string;
 }
 
 const userSchema = new mongoose.Schema({

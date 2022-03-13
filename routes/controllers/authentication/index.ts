@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { User, UserInterface } from '../../../models/user';
+import { User, UserInterface, UserDoc } from '../../../models/user';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { handleValidation } from '../../../utils/index';
@@ -17,9 +17,9 @@ export default {
   async verify(req: Request, res: Response, next: NextFunction) {
     try {
       const username: string = req?.params?.username ?? '';
-      const registeredUser = await User.findOne({ username });
+      const registeredUser: UserDoc = await User.findOne({ username });
 
-      if (!registeredUser) return res.status(202).json({ message: 'User not found' })
+      if (!registeredUser) return res.status(202).end();
       return res.status(200).json(registeredUser);
 
     } catch (err) {
@@ -38,20 +38,20 @@ export default {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
       const credentials: UserInterface = req?.body;
-      const { username, password}: { username: string, password: string } = credentials
+      const { username, password}: UserInterface = credentials;
 
       // validate username and password
       handleValidation(username, password, res);
 
       // make sure there is no duplicate username
-      const existingUser: UserInterface = await User.findOne({ username })
-      if (existingUser) return res.status(202).json({ success: false, message: 'An account with this name already exists.' })
+      const existingUser: UserDoc = await User.findOne({ username });
+      if (!!existingUser) return res.status(202).end();
 
       // encrypt password
       const salt = await bcrypt.genSalt();
       const passwordHash = await bcrypt.hash(password, salt);
 
-      const newUser = User.instantiate({ username, password: passwordHash });
+      const newUser: UserDoc = User.instantiate({ username, password: passwordHash });
       await newUser.save();
       return res.status(201).send({ ...newUser, success: true });
 
@@ -70,15 +70,15 @@ export default {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const credentials: UserInterface = req?.body;
-      const { username, password}: { username: string, password: string } = credentials
+      const { username, password}: UserInterface = credentials
 
-      const user: UserInterface = await User.findOne({ username });
+      const user: UserDoc = await User.findOne({ username });
 
       // if no user is found, or if password is wrong:
       if (!user || !await bcrypt.compare(password, user.password)) 
-        return res.status(202).json({ success: false, message: 'Wrong credentials, try again.'  });
+        return res.status(202).end();
 
-      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+      const token: string = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
       return res.status(200).json({
         username,
@@ -103,15 +103,15 @@ export default {
     try {
       const token: string = req?.header('X-Auth-Token');
       
-      if (!token) return res.json({ success: false, message: 'No Auth Token' });
+      if (!token) return res.status(202).end();
 
-      const verified: any = jwt.verify(token, process.env.JWT_SECRET);
-      if (!verified) return res.json({ success: false, message: 'User not verified' });
+      const verified: jwt.JwtPayload & UserDoc = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload & UserDoc;
+      if (!verified) return res.status(202).end();
 
-      const user = await User.findById(verified._id);
-      if (!user) return res.json({ success: false, message: 'User not found' });
-
-      return res.status(200).json({ success: true });
+      const user: UserDoc = await User.findById(verified._id);
+      if (!user) return res.status(202).end();
+      console.log('OK')
+      return res.status(200).end();
       
     } catch (err) {
       next(new HttpException(404, err.message));
